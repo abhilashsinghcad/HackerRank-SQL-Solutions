@@ -1,0 +1,38 @@
+select t1.code, 
+       t1.founder,
+       t1.lead_manager,
+       t1.senior_manager,
+       t2.manager,
+       t2.employee
+
+FROM 
+
+(SELECT c.company_code as code,
+        c.founder as founder,
+        count(distinct(l.lead_manager_code)) as lead_manager,
+        count(distinct(s.senior_manager_code)) as senior_manager
+FROM company as c
+INNER JOIN lead_manager as l
+ON c.company_code = l.company_code
+INNER JOIN senior_manager as s
+ON l.lead_manager_code = s.lead_manager_code
+GROUP BY c.company_code,
+         c.founder,
+         l.lead_manager_code
+ORDER BY c.company_code) AS t1
+
+INNER JOIN 
+
+(SELECT s.company_code as code,
+        count(distinct(m.manager_code)) as manager,
+        count(distinct(e.employee_code)) as employee
+FROM senior_manager as s
+INNER JOIN manager as m
+ON s.senior_manager_code = m.senior_manager_code
+INNER JOIN employee as e
+ON m.manager_code = e.manager_code
+GROUP BY s.company_code
+ORDER BY s.company_code) AS t2
+
+ON t1.code = t2.code;
+

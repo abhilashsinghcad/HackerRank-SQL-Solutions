@@ -1,0 +1,13 @@
+SELECT t2.hacker_id, h.name, t2.score
+FROM(
+    (SELECT hacker_id, SUM(mscore) AS score
+     FROM
+     (SELECT hacker_id, challenge_id, MAX(score) AS mscore
+      FROM Submissions as s
+      GROUP BY hacker_id, challenge_id) as t1
+     
+     GROUP BY hacker_id 
+     HAVING score <> 0) as t2)
+INNER JOIN Hackers as h
+ON t2.hacker_id = h.hacker_id
+ORDER BY t2.score DESC, t2.hacker_id;

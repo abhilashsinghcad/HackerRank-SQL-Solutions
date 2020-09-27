@@ -1,0 +1,21 @@
+SET @r1 = 0, @r2 =0;
+
+SELECT Start_Date,
+       End_Date
+       
+FROM (SELECT @r1:= @r1+1 as r1,
+             Start_Date
+      FROM (SELECT Start_Date 
+            FROM Projects
+            WHERE Start_Date NOT IN (SELECT End_Date FROM Projects)) as t1) as t3
+
+INNER JOIN(SELECT @r2:= @r2+1 as r2,
+           End_Date
+           FROM (SELECT End_Date 
+                 FROM Projects 
+                 WHERE End_Date NOT IN (SELECT Start_Date FROM Projects)) as t2) as t4
+
+ON t3.r1 = t4.r2
+
+ORDER BY End_Date - Start_Date,
+         Start_Date;

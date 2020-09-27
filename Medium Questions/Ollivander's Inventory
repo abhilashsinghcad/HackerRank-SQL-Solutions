@@ -1,0 +1,17 @@
+SELECT id,
+       p.age,
+       t.coins_needed,
+       t.power
+FROM(SELECT code,
+            power, 
+            MIN(coins_needed) AS coins_needed
+            FROM Wands
+            GROUP BY code,
+                     power) AS t
+INNER JOIN Wands as w
+ON w.code = t.code AND w.power = t.power AND w.coins_needed = t.coins_needed
+INNER JOIN Wands_Property as p
+ON t.code = p.code
+WHERE p.is_evil = 0
+ORDER BY w.power DESC,
+         p.age DESC;

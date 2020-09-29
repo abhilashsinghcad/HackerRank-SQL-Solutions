@@ -1,0 +1,31 @@
+SELECT t1.hacker_id,
+       t1.name,
+       t1.c
+FROM (SELECT h.hacker_id,
+      h.name,
+      count(c.challenge_id) AS c
+      FROM Challenges c
+      INNER JOIN Hackers h USING(hacker_id)
+      GROUP BY hacker_id, h.name) t1
+
+WHERE t1.c IN (SELECT t2.c
+               FROM (SELECT h.hacker_id,
+                     h.name,
+                     count(c.challenge_id) AS c
+                     FROM Challenges c
+                     INNER JOIN Hackers h USING(hacker_id)
+                     GROUP BY hacker_id, h.name) t2 
+               GROUP BY t2.c 
+               HAVING COUNT(t2.c) = 1)
+
+OR t1.c =  (SELECT MAX(t3.c) 
+            FROM (SELECT h.hacker_id,
+                  h.name,
+                  count(c.challenge_id) AS c
+                  FROM Challenges c
+                  INNER JOIN Hackers h USING(hacker_id)
+                  GROUP BY hacker_id, h.name) t3)
+                                    
+ORDER BY t1.c DESC,
+         t1.hacker_id;
+            
